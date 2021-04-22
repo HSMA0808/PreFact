@@ -25,9 +25,11 @@ namespace PreFact.Clases
 
         public string InsertarVenta()
         {
-            var IdVenta = string.Empty;
-            var comando = new SqlCommand("EXEC INSERTAR_VENTA @Cliente, @Telefono, @Direccion, " +
+            var ds = ExtraerDataSet(new SqlCommand("select * from ventas"));
+            IdVenta = ds.Tables[0].Rows.Count + 1;
+            var comando = new SqlCommand("EXEC INSERTAR_VENTA @idventa, @Cliente, @Telefono, @Direccion, " +
             "@Condiciones, @SubTotal, @Itbis, @Total, @Fecha");
+            comando.Parameters.Add(new SqlParameter("@idventa", IdVenta));
             comando.Parameters.Add(new SqlParameter("@Cliente", Cliente));
             comando.Parameters.Add(new SqlParameter("@Telefono", Telefono));
             comando.Parameters.Add(new SqlParameter("@Direccion", Direccion));
@@ -37,8 +39,7 @@ namespace PreFact.Clases
             comando.Parameters.Add(new SqlParameter("@Total", Total));
             comando.Parameters.Add(new SqlParameter("@Fecha", Fecha));
             EjecutarQuery(comando, true);
-            //retorna el id de la venta insertada
-            return ExtraerDataSet(new SqlCommand("select MAX(IdVenta) from Ventas")).Tables[0].Rows[0][0].ToString();
+            return IdVenta.ToString();
         }
 
         public DataSet VentaParametrizable(string id)
